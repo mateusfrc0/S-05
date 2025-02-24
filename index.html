@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Reserva de Armário</title>
     <link rel="stylesheet" href="styles.css">
-    <script src="scripts.js"></script>
 </head>
 <body>
     <div class="container">
@@ -16,7 +15,40 @@
             <option value="duplo">Duplo</option>
         </select>
         <button onclick="reservarArmario()">Reservar</button>
-        <p id="resultado"></p>
+        <div id="resultado" class="resultado-container"></div>
     </div>
+
+    <script>
+        function reservarArmario() {
+            let tipoSelecionado = document.getElementById("tipoArmario").value;
+            let armariosDisponiveis = armarios.filter(a => a.formato === tipoSelecionado && a.status === true && usuario.acessibilidade === a.acessivel);
+    
+            if (armariosDisponiveis.length === 0) {
+                document.getElementById("resultado").innerHTML = `<p>Olá, ${usuario.nome}! Nenhum armário disponível para o tipo selecionado.</p>`;
+                return;
+            }
+    
+            let armarioSorteado = armariosDisponiveis[Math.floor(Math.random() * armariosDisponiveis.length)];
+            let armarioEmprestado = armarios.find(armario => armario.id === armarioSorteado.id);
+    
+            let agora = new Date();
+            armarioEmprestado.dataReserva = agora;
+    
+            let dataEntrega = new Date(agora.getTime() + 24 * 60 * 60 * 1000);
+            armarioEmprestado.dataEntrega = dataEntrega;
+    
+            armarioEmprestado.status = false;
+            usuario.pendencia = true;
+    
+            document.getElementById("resultado").innerHTML = `
+                <p>Olá, ${usuario.nome}! O armário ${armarioEmprestado.id} foi reservado com sucesso!</p>
+                <p><strong>Data e hora de reserva:</strong> ${agora.toLocaleString()}</p>
+                <p><strong>Data e hora de entrega:</strong> ${dataEntrega.toLocaleString()}</p>
+            `;
+    
+            console.log(usuario);
+            console.log(armarios);
+        }
+    </script>
 </body>
 </html>
