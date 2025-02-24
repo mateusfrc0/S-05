@@ -15,32 +15,31 @@ const armarios = [
 
 // função para reserva do armário, incluindo as regras.
 function reservarArmario() {
-  
-  // obter tipo de armário selecionado pelo usuário no html.
   let tipoSelecionado = document.getElementById("tipoArmario").value;
-  
-  // na lista, filtrar apenas os armários que estão disponíveis e que são acessiveis ao usuário.
   let armariosDisponiveis = armarios.filter(a => a.formato === tipoSelecionado && a.status === true && usuario.acessibilidade === a.acessivel);
-  
-  // caso não exista armário disponível, retorna para o usuário mensagem.
+
   if (armariosDisponiveis.length === 0) {
     document.getElementById("resultado").innerText = `Olá, ${usuario.nome}! Nenhum armário disponível para o tipo selecionado.`;
     return;
   }
-  
-  // Caso exista armário(s) disponíveil, seguimos sorteando uma opção. 
+
   let armarioSorteado = armariosDisponiveis[Math.floor(Math.random() * armariosDisponiveis.length)];
+  let armarioEmprestado = armarios.find(armario => armario.id === armarioSorteado.id);
   
-  // Depois localizamos o armário emprestado na lista de armarios e mudamos o status do armário.
-  let armarioEmprestado = armarios.find(armario => armario.id === armarioSorteado.id).status = false;
+  // Registrar a data e hora da reserva
+  let agora = new Date();
+  armarioEmprestado.dataReserva = agora;
   
-  // Finalmente, mudamos a pendencia do usuário para verdadeira.
+  // Calcular a data e hora de entrega (24h depois)
+  let dataEntrega = new Date(agora.getTime() + 24 * 60 * 60 * 1000);
+  armarioEmprestado.dataEntrega = dataEntrega;
+  
+  // Atualizar o status do armário
+  armarioEmprestado.status = false;
   usuario.pendencia = true;
   
-  // Impmimimos uma mensagem de reserva para o usuário.
-  document.getElementById("resultado").innerText = `Olá, ${usuario.nome}! O armário ${armarioSorteado.id} foi reservado com sucesso!`;
-
+  document.getElementById("resultado").innerText = `Olá, ${usuario.nome}! O armário ${armarioEmprestado.id} foi reservado com sucesso!\nData e hora de entrega: ${dataEntrega.toLocaleString()}`;
+  
   console.log(usuario);
   console.log(armarios);
-
 }
